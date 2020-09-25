@@ -1,0 +1,21 @@
+// EMA ---------------------------------------------------
+
+ema13 = input(title = "EMA 13", type=input.integer, defval=13)
+//ema13_timeframe = input(title="EMA 13 Timeframe", type=input.resolution,  defval="")
+ema20 = input(title = "EMA 20", type=input.integer, defval=20)
+//ema20_timeframe = input(title="EMA 20 Timeframe", type=input.resolution,  defval="")
+ema50 = input(title = "EMA 50", type=input.integer, defval=50)
+//ema50_timeframe = input(title="EMA 50 Timeframe", type=input.resolution,  defval="")
+ema100 = input(title = "EMA 100", type=input.integer, defval=100)
+//ema100_timeframe = input(title="EMA 100 Timeframe", type=input.resolution,  defval="")
+ema200 = input(title = "EMA 200", type=input.integer, defval=200)
+//ema200_timeframe = input(title="EMA 200 Timeframe", type=input.resolution,  defval="")
+ 
+ 
+ 
+//plot(ema20 > 0 ?  ema(security(syminfo.tickerid,ema20_timeframe , close),ema20) : na, title = "EMA 20", color=color.new(color.blue,50))
+plot(ema13 > 0 ? ema(close,ema13) : na, title = "EMA 13", color=color.new(color.white,50), linewidth=3)
+plot(ema20 > 0 ? ema(close,ema20) : na, title = "EMA 20", color=color.new(color.blue,50))
+plot(ema50 > 0 ? ema(close,ema50) : na, title = "EMA 50", color=color.new(color.green,50))
+plot(ema100 > 0 ? ema(close,ema100) : na, title = "EMA 100", color=color.new(color.orange,50))
+plot(ema200 > 0 ? ema(close,ema200) : na, title = "EMA 200", color=color.new(color.red,50))

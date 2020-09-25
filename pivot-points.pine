@@ -1,0 +1,129 @@
+// Pivot Points
+
+is_fibonacci = input(title="Fibonacci", type= input.bool, defval=true)
+
+transparency = 0
+
+
+get_pplc(resolution) =>
+    pp = security(syminfo.tickerid, resolution, hlc3[1], lookahead=true)
+    h = security(syminfo.tickerid, resolution, high[1], lookahead=true)
+    l = security(syminfo.tickerid, resolution, low[1], lookahead=true)
+    [pp,h,l]
+
+
+traditional_pivot_points(pp, h, l) =>
+    r1 = (2 * pp) - l
+    r2 = pp + (h - l)
+    r3 = h + 2 *(pp - l)
+    s1 = (2 * pp) - h
+    s2 = pp - (h - l)
+    s3 = l - 2 * (h - pp)
+    [r1,r2,r3,s1,s2,s3]
+    
+fibonacci_pivot_points(pp, h, l) =>
+    r1 = pp + ((h - l) * 0.382)
+    r2 = pp + ((h - l) * 0.618)
+    r3 = pp + ((h - l) * 1.000)
+    s1 = pp - ((h - l) * 0.382)
+    s2 = pp - ((h - l) * 0.618)
+    s3 = pp - ((h - l) * 1.000)
+    [r1,r2,r3,s1,s2,s3]
+
+  
+draw_pivot_points(prefix, resolution) =>
+    [pp, h, l] = get_pplc(resolution)
+    
+    var float r1 = na
+    var float r2 = na
+    var float r3 = na
+    var float s1 = na
+    var float s2 = na
+    var float s3 = na
+        
+    
+    if is_fibonacci
+        [_r1, _r2, _r3, _s1, _s2, _s3] = fibonacci_pivot_points(pp,h,l)
+        r1 := _r1
+        r2 := _r2
+        r3 := _r3
+        s1 := _s1
+        s2 := _s2
+        s3 := _s3
+    else
+        [_r1, _r2, _r3, _s1, _s2, _s3] = traditional_pivot_points(pp,h,l)
+        r1 := _r1
+        r2 := _r2
+        r3 := _r3
+        s1 := _s1
+        s2 := _s2
+        s3 := _s3
+    
+    
+    var line pp_line = na
+    var line r1_line = na
+    var line r2_line = na
+    var line r3_line = na
+    var line s1_line = na
+    var line s2_line = na
+    var line s3_line = na
+
+    var label pp_label = na
+    var label r1_label = na
+    var label r2_label = na
+    var label r3_label = na
+    var label s1_label = na
+    var label s2_label = na
+    var label s3_label = na
+    
+    
+    if pp[1] != pp
+        pp_line  := line.new(bar_index, pp, bar_index, pp, width=1, extend=extend.right, color=color.new(color.yellow, transparency), style=line.style_dotted)
+        pp_label := label.new(bar_index, pp, text="  P  " ,color=color.new(color.yellow, transparency), textcolor=color.black,textalign=text.align_center,style=label.style_label_right, size=size.small, tooltip=prefix + " " + "Pivot")
+        r1_line  := line.new(bar_index, r1, bar_index, r1, width=1, extend=extend.right, color=color.new(color.silver, transparency), style=line.style_dotted)
+        r1_label := label.new(bar_index, r1, text=" R1 ",color=color.new(color.silver, transparency), textcolor=color.black,textalign=text.align_center,style=label.style_label_right, size=size.small, tooltip=prefix + " " + "R1")
+        r2_line  := line.new(bar_index, r2, bar_index, r2, width=1, extend=extend.right, color=color.new(color.silver, transparency), style=line.style_dotted)
+        r2_label := label.new(bar_index, r2, text=" R2 ",color=color.new(color.silver, transparency), textcolor=color.black,textalign=text.align_center,style=label.style_label_right, size=size.small, tooltip=prefix + " " + "R2")
+        r3_line  := line.new(bar_index, r3, bar_index, r3, width=1, extend=extend.right, color=color.new(color.silver, transparency), style=line.style_dotted)
+        r3_label := label.new(bar_index, r3, text=" R3 ",color=color.new(color.silver, transparency), textcolor=color.black,textalign=text.align_center,style=label.style_label_right, size=size.small, tooltip=prefix + " " + "R3")
+        s1_line  := line.new(bar_index, s1, bar_index, s1, width=1, extend=extend.right, color=color.new(color.silver, transparency), style=line.style_dotted)
+        s1_label := label.new(bar_index, s1, text=" S1 ",color=color.new(color.silver, transparency), textcolor=color.black,textalign=text.align_center,style=label.style_label_right, size=size.small, tooltip=prefix + " " + "S1")
+        s2_line  := line.new(bar_index, s2, bar_index, s2, width=1, extend=extend.right, color=color.new(color.silver, transparency), style=line.style_dotted)
+        s2_label := label.new(bar_index, s2, text=" S2 ",color=color.new(color.silver, transparency), textcolor=color.black,textalign=text.align_center,style=label.style_label_right, size=size.small, tooltip=prefix + " " + "S2")
+        s3_line  := line.new(bar_index, s3, bar_index, s3, width=1, extend=extend.right, color=color.new(color.silver, transparency), style=line.style_dotted)
+        s3_label := label.new(bar_index, s3, text=" S3 ",color=color.new(color.silver, transparency), textcolor=color.black,textalign=text.align_center,style=label.style_label_right, size=size.small, tooltip=prefix + " " + "S3")
+    if not na(pp_line) and line.get_x2(pp_line) != bar_index
+        line.set_x2(pp_line, bar_index)
+        line.set_x2(r1_line, bar_index)
+        line.set_x2(r2_line, bar_index)
+        line.set_x2(r3_line, bar_index)
+        line.set_x2(s1_line, bar_index)
+        line.set_x2(s2_line, bar_index)
+        line.set_x2(s3_line, bar_index)
+
+
+
+
+// Daily Pivot Points
+show_daily_pivot_point = input(type=input.bool, title='Show Daily Pivot Points', defval=true)
+daily_condition = timeframe.isintraday  and time / 1000 / 60 / 60 / 24 > timenow / 1000 / 60 / 60 / 24 - 1
+
+
+if show_daily_pivot_point and daily_condition
+    draw_pivot_points('Daily','D')
+
+
+// Weekly Pivot Points
+show_weekly_pivot_point = input(type=input.bool, title='Show Weekly Pivot Points', defval=true)
+weekly_condition = (timeframe.isdaily or timeframe.isintraday) and (year == year(timenow)) and weekofyear>=weekofyear(timenow)-1
+
+if show_weekly_pivot_point and weekly_condition
+    draw_pivot_points('Weekly','W')
+
+
+// Monthly Pivot Points
+show_monthly_pivot_point = input(type=input.bool, title='Show Monthly Pivot Points', defval=true)
+monthly_condition = not(timeframe.ismonthly) and year == year(timenow) and month >= month(timenow)-1
+
+if show_monthly_pivot_point and monthly_condition
+    draw_pivot_points('Monthly','M')

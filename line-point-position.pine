@@ -1,0 +1,39 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © mediplex
+
+//@version=4
+study("My Script")
+
+
+// cross product
+is_above(Ax, Ay, Bx, By, Mx, My) =>
+    ((Bx - Ax)*(My - Ay) - (By - Ay)*(Mx - Ax)) >= 0
+     
+
+
+
+if barstate.islast
+    Ax = bar_index[100]
+    Ay = 42
+    
+    Bx = bar_index
+    By = 55
+    
+    Mx = bar_index[50]
+    My = 45
+    
+    Nx = bar_index[50]
+    Ny = 52
+    
+    line.new(Ax, Ay, Bx, By, color=color.green)
+    label.new(Ax, Ay, style=label.style_circle, size=size.normal, color=color.green, textcolor=color.white, text='A')
+    label.new(Bx, By, style=label.style_circle, size=size.normal, color=color.green, textcolor=color.white, text='B')
+    
+    M = label.new(Mx, My, style=label.style_xcross, size=size.small, textcolor=color.white, text='M')
+    N = label.new(Nx, Ny, style=label.style_xcross, size=size.small, textcolor=color.white, text='N')
+    
+    if is_above(Ax, Ay, Bx, By,Mx, My)
+        label.set_text(M, 'Above')
+    else 
+        label.set_text(M, 'Below')
+    
