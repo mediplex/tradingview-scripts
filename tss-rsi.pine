@@ -1,0 +1,159 @@
+//@version=4
+study(title="Relative Strength Index", shorttitle="RSI", format=format.price, precision=2)//
+len = input(14, minval=1, title="Length")
+src = input(low, "Source", type = input.source) //close > open ? high : low
+rsi = rsi(src,len)
+plot(rsi, "RSI", color= color.new(color.gray, 0), linewidth=2)
+
+
+// loop on different timeframes and detect divergences and show a report with long/sell opportunities
+
+var bar_index_array = array.new_int(0) // instead of having this array I can use array.insert() and use the bar_index as array index
+var rsi_array  = array.new_float(0)
+var price_array  = array.new_float(0)
+
+var all_bar_index_array  = array.new_float(0)
+var all_price_array  = array.new_float(0)
+
+array.push(all_bar_index_array,low[1])
+array.push(all_price_array,low[1])
+
+//no_cut_check(_b1,_b2)=> //bar_indexes
+//    var bool no_cut = true
+//    for i=0 to array.indexof(all_index_array)-2
+//        for j=i+1 to array.size(all_bar_index_slice)-1
+//            if array.get(all_price_array, _b1) < array.get(all_price_array, _b2)
+//                array.get(all_price_array, i)  array.get(all_price_array, j)
+//                    no_cut := false
+//                    break
+//            else
+//    no_cut
+    
+
+
+
+
+r = input(title='Right', defval=1, type=input.integer)
+l = input(title='Left', defval=1, type=input.integer)
+
+rsi_pl = pivotlow(rsi,l,r)
+price_pl = pivotlow(low,l,r)
+
+
+if not(na(rsi_pl)) and not(na(price_pl)) and time/1000/60/60/24 > timenow/1000/60/60/24 -30 // 30days // 
+    array.push(bar_index_array,bar_index-1)
+    array.push(rsi_array,rsi[1])
+    array.push(price_array,low[1])
+    //label.new(bar_index[1],rsi[1]-3, style=label.style_label_up, size=size.tiny, color=color.red)
+
+
+
+if barstate.islast and array.size(bar_index_array) >= 2
+    label.new(bar_index,rsi, style=label.style_label_left, size=size.normal,text=tostring(array.size(bar_index_array)), color=color.white)
+    
+    for i=0 to array.size(bar_index_array)-2
+        //if i < array.size(bar_index_array)-1
+        for j=i+1 to array.size(bar_index_array)-1
+    
+            hidden_bullish_divergence = array.get(rsi_array,i)>array.get(rsi_array,j) and array.get(price_array,i)<array.get(price_array,j)
+            
+            label.new(array.get(bar_index_array,i), array.get(rsi_array,i), style=label.style_label_up, size=size.normal, color=color.green, text='i', textcolor=color.white  )
+            label.new(array.get(bar_index_array,j), array.get(rsi_array,j), style=label.style_label_up, size=size.normal, color=color.green, text='j', textcolor=color.white )
+            if hidden_bullish_divergence //and array.get(bar_index_array,i)>array.get(bar_index_array,j)
+                
+                line.new(array.get(bar_index_array,i), array.get(rsi_array,i), array.get(bar_index_array,j), array.get(rsi_array,j), width=2, color=color.green)
+           
+
+
+
+
+
+
+
+
+
+// Overbought/Oversold
+//rsi_color = rsi >= 70 or rsi <=30 ? color.purple : crossover(rsi,50) ? color.green : crossunder(rsi,50) ? color.red :na
+//rsi_color = rsi >= 66.66 or rsi <=33.33 ? color.purple : na
+//plot(rsi, "Overbought/Oversold" ,color = rsi_color, style = plot.style_circles, linewidth = 2)
+overbought_hline = hline(66.66, title='Overbought Line', color=color.new(color.gray,60), linestyle=hline.style_dotted)
+oversold_hline = hline(33.33, title='Oversold Line', color=color.new(color.gray,60), linestyle=hline.style_dotted)
+fill(overbought_hline,oversold_hline,color=color.new(color.gray,85))
+
+
+//ema_close_length = input(title='EMA Close Length', type=input.integer, defval=7)
+//ema_close=ema(high,ema_close_length)
+//barcolor(ema_close[1]<ema_close? color.green: na)
+
+//hline(50, "50 Band", color=color.new(#FFFFFF, 80), linestyle=hline.style_dashed, linewidth=1)
+
+//ema_timeframe = input(title="EMA Timeframe", type=input.resolution,  defval="D")
+//ema_length = input (title="EMA Length", type=input.integer, defval=200) // 14*5
+//higher_timeframe_close = security(syminfo.tickerid, expression =  close > open ? high : low,resolution=ema_timeframe, lookahead=barmerge.gaps_on)
+//ema = ema(rsi,ema_length)
+
+////plot(ema)
+////ema move up or down signal
+//plot(ema, color= ema[1]<ema ? color.new(color.green,0) : color.new(color.red,0) , style=plot.style_line, linewidth=1)
+////price and rsi divergences
+//plot(rsi, color= rsi<rsi[1] and src > src[1] ? color.orange : rsi>rsi[1] and src < src[1] ? color.blue :  na , style=plot.style_circles, linewidth=2)
+
+
+
+
+// // labels
+// 
+// len_ =  input(title="Length High", type=input.integer, defval=5, minval=1)
+// //lenL = 14 //input(title="Length Low", type=input.integer, defval=10, minval=1)
+// 
+// fun(src, _len, isHigh, _style, _yloc, _color) =>
+//     p = nz(src[_len])
+//     isFound = true
+//     for i = 0 to _len - 1
+//         if isHigh and src[i] > p
+//             isFound := false
+// 
+//         if not isHigh and src[i] < p
+//             isFound := false
+// 
+//     for i = _len + 1 to 2 * _len
+//         if isHigh and src[i] >= p
+//             isFound := false
+// 
+//         if not isHigh and src[i] <= p
+//             isFound := false
+// 
+//     if isFound and bar_index[_len]>len
+//         label.new(bar_index[_len], p, "", style=_style, yloc=_yloc, color=_color, size=size.tiny)
+//     
+// 
+// 
+// 
+// fun(rsi, len_, true, label.style_label_down, yloc.price, color.green)
+// fun(rsi, len_, false, label.style_label_up, yloc.price, color.red)
+
+
+
+
+
+
+
+//// Stochastic RSI
+//
+////study(title="Stochastic RSI", shorttitle="Stoch RSI", format=format.price, precision=2, resolution="")
+//smoothK = input(3, "K", minval=1)
+//smoothD = input(3, "D", minval=1)
+//lengthRSI = input(14, "RSI Length", minval=1)
+//lengthStoch = input(14, "Stochastic Length", minval=1)
+////src = input(close, title="RSI Source")
+//rsi1 = rsi(src, lengthRSI)
+//k = sma(stoch(rsi1, rsi1, rsi1, lengthStoch), smoothK)
+//d = sma(k, smoothD)
+//plot(k*0.3+30, "K", color=color.new(color.blue,75))
+//plot(k*0.3+30, "K/D Crosses", color= crossover(k,d)? color.new(color.green,75) : crossunder(k,d) ? color.new(color.red,75) : na, style=plot.style_circles, linewidth=2)
+//plot(d*0.3+30, "D", color=color.new(color.orange,75))
+////h0 = hline(80, "Upper Band", color=#606060)
+////h1 = hline(20, "Lower Band", color=#606060)
+////fill(h0, h1, color=#9915FF, transp=80, title="Background")
+
+//linear regression to define the trend
